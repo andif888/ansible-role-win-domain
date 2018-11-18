@@ -1,0 +1,58 @@
+---
+# tasks file for ansible-role-win-domain
+- name: Windows Feature AD-Domain-Services and Tools
+  win_feature:
+    name: AD-Domain-Services
+    state: present
+    include_sub_features: yes
+    include_management_tools: yes
+  register: win_feature
+
+- name: reboot if installing AD-Domain-Services feature requires it
+  win_reboot:
+  when: win_feature.reboot_required
+
+- name: create domain
+  win_domain:
+    dns_domain_name: "{{ dns_domain_name }}"
+    domain_netbios_name: "{{ domain_netbios_name }}"
+    safe_mode_password: "{{ safe_mode_password }}"
+  register: win_domain
+
+- name: Copy Policy Definitions to central location
+  win_robocopy:
+    src: C:\Windows\PolicyDefinitions
+    dest: C:\Windows\SYSVOL\domain\Policies\PolicyDefinitions
+    recurse: yes
+
+- name: reboot if installing Domain requires it
+  win_reboot:
+    post_reboot_delay: 30
+    pre_reboot_delay: 10
+    reboot_timeout: 1200
+  when: win_domain.reboot_required
+
+- name: Wait for DNS available
+  win_wait_for:
+    port: 53
+    delay: 10
+    sleep: 5
+    timeout: 600
+
+- name: Test - add domain user
+  win_domain_user:
+    name: testuser
+    password: Passw0rd
+    state: present
+  register: win_domain_user
+  until: win_domain_user.failed == false
+  retries: 40
+  delay: 15
+  ignore_errors: yes
+  changed_when: False
+
+- name: Test - remove domain user
+  win_domain_user:
+    name: testuser
+    state: absent
+  changed_when: False

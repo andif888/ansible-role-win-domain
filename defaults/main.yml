@@ -1,0 +1,5 @@
+---
+# defaults file for ansible-role-win-domain
+dns_domain_name: domain.local
+domain_netbios_name: DOMAIN
+safe_mode_password: vagrant
