@@ -23,7 +23,7 @@
   win_robocopy:
     src: C:\Windows\PolicyDefinitions
     dest: C:\Windows\SYSVOL\domain\Policies\PolicyDefinitions
-    recurse: yes
+    flags: /e /copyall
 
 - name: reboot if installing Domain requires it
   win_reboot:
