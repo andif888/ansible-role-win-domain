@@ -3,3 +3,4 @@
 dns_domain_name: domain.local
 domain_netbios_name: DOMAIN
 safe_mode_password: vagrant
+domain_policies_central: false

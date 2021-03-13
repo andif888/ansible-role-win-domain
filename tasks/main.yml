@@ -24,6 +24,7 @@
     src: C:\Windows\PolicyDefinitions
     dest: C:\Windows\SYSVOL\domain\Policies\PolicyDefinitions
     flags: /e /copyall
+  when: domain_policies_central
 
 - name: reboot if installing Domain requires it
   win_reboot:
